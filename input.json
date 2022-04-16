@@ -1,4 +1,5 @@
 {
+  "output": "output.pbm",
   "height": 250,
   "width": 250,
   "objects": [
