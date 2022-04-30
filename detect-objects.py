@@ -1,4 +1,6 @@
-import sys
+import sys, threading
+sys.setrecursionlimit(10**7) # max depth of recursion
+threading.stack_size(2**27)  # new thread will get stack of such size
 
 # Prints error to stdout and then exits with code 1
 def error(message):
@@ -16,7 +18,9 @@ def read_line(file):
 
 # Reads a single integer from the next line
 def read_int(file):
-  return int(read_line(file))
+  line = read_line(file)
+  if line:
+    return int(line)
 
 # Creates a matrix filled with zeroes
 def zeroes_matrix(height, width):
@@ -31,24 +35,18 @@ def read_pgm(file_path):
     error(f'Expected file type to be P1 (binary), got "{file_type}" instead')
 
   width, height = map(int, read_line(file).split())
-  max_value = read_int(file)
 
   matrix = zeroes_matrix(height, width)
 
   for row in range(height):
+    new_line = read_line(file).split()
     for column in range(width):
-      matrix[row][column] = read_int(file)
-
-      if matrix[row][column] > max_value:
-        found_value = matrix[row][column]
-        print(f'Warning: max value is {max_value}, found {found_value} at position ({row}, {column})')
-        matrix[row][column] = max_value
+      matrix[row][column] = int(new_line[column])
   
   return {
     'file_type': file_type,
     'width': width,
     'height': height,
-    'max_value': max_value,
     'matrix': matrix
   }
 
@@ -68,11 +66,13 @@ def get_neighbors(i, j):
       if neighbor_y < 0 or neighbor_y >= height:
         continue
       
-      neighbors.append([neighbor_x, neighbor_y])
+      if [neighbor_x, neighbor_y] != [i, j]:
+        neighbors.append([neighbor_x, neighbor_y])
   
   return neighbors
 
 def fill(i, j):
+  tags[i][j] = 1
   for neighbor in get_neighbors(i, j):
     m, n = neighbor
 
@@ -96,15 +96,16 @@ NO_TAG = 0
 last_tag = 0
 height = pgm['height']
 width = pgm['width']
+cont = 0
 
 for i in range(height):
   for j in range(width):
-    if tags[i][j] == NO_TAG:
+    if tags[i][j] == NO_TAG and color[i][j] == 1:
       last_tag += 1
       fill(i, j)
+      print(f'Found new object at ({i}, {j})')
+      cont += 1
 
-      if color[i][j] == 0:
-        print(f'Found blank space at ({i}, {j})')
-      else:
-        print(f'Found new object at ({i}, {j}')
+print(f'Total objects found = {cont}')
+
       
