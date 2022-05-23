@@ -1,4 +1,8 @@
 import sys, threading
+import time 
+
+start = time.time()
+
 sys.setrecursionlimit(10**7) # max depth of recursion
 threading.stack_size(2**27)  # new thread will get stack of such size
 
@@ -210,3 +214,10 @@ for i in range(height):
 
 print(f'\n > Found a total of {count_objects} objects.')
 print(f" > {count_objects_with_holes} have holes, while {count_objects - count_objects_with_holes} don't.")
+
+print(f'\n > Image size: {width}x{height} ({width * height} pixels)')
+
+end = time.time()
+time_elapsed = end - start
+
+print(f' > Time elapsed: {time_elapsed:.3f}s')
