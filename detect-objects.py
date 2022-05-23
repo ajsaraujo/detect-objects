@@ -44,17 +44,6 @@ def read_pgm(file_path):
     'matrix': matrix
   }
 
-# Store data in a ppm file
-def store_ppm( type, size_x, size_y, data ):
-    ppm_header = f'{type}\n{size_y} {size_x}\n'
-    f = open('saida.ppm', 'w')
-    f.write( ppm_header )
-    for x in range(size_x):
-        for y in range(size_y):
-            f.write(f'{data[x][y]} ')
-        f.write(f'\n')
-    f.close()
-
 # Find the seed element to fill the holes in the image
 def find_seed(M, N, f):
     for x in range(M):
