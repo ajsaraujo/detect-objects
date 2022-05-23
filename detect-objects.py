@@ -165,7 +165,7 @@ def fill(i, j, f, f_holes_filled):
       fill(m, n, f, f_holes_filled)
       if f_holes_filled[i][j] != f[i][j] and object_has_holes == False:
         object_has_holes = True
-        print("Hole found in this object")
+        print(" > Found a hole in this object.\n")
 
 
 
@@ -175,7 +175,15 @@ if not file_path_was_passed:
   error('Please provide an image file path')
 
 file_path = sys.argv[1]
-pgm = read_pgm(file_path)
+
+pgm = None 
+
+try:
+  pgm = read_pgm(file_path)
+except:
+  print(f'\n[ERROR] Did not find a file at {file_path}, please make sure you provided the right path.\n')
+  exit(1)
+
 tags = zeroes_matrix(pgm['height'], pgm['width'])
 color = pgm['matrix']
 
@@ -191,7 +199,7 @@ f_holes_filled = fill_holes(height, width, color)
 for i in range(height):
   for j in range(width):
     if tags[i][j] == NO_TAG and color[i][j] == 1:
-      print(f'Found new object at ({i}, {j})')
+      print(f' > Found new object at ({i}, {j})')
       count_objects += 1
 
       object_has_holes = False
@@ -200,6 +208,5 @@ for i in range(height):
       if object_has_holes:
         count_objects_with_holes += 1
 
-print(f'Total objects found = {count_objects}')
-print(f'Total objects with holes = {count_objects_with_holes}')
-print(f'Total objects without holes = {count_objects - count_objects_with_holes}')
+print(f'\n > Found a total of {count_objects} objects.')
+print(f" > {count_objects_with_holes} have holes, while {count_objects - count_objects_with_holes} don't.")
