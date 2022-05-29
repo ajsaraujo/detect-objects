@@ -1,10 +1,9 @@
-import sys, threading
-import time 
-
-start = time.time()
+import sys, time, threading
 
 sys.setrecursionlimit(10**7) # max depth of recursion
 threading.stack_size(2**27)  # new thread will get stack of such size
+
+start = time.time()
 
 # Prints error to stdout and then exits with code 1
 def error(message):
@@ -48,7 +47,7 @@ def read_pgm(file_path):
     'matrix': matrix
   }
 
-# Find the seed element to fill the holes in the image
+# Find the seed element for region fill algorithm
 def find_seed(M, N, f):
     for x in range(M):
         for y in range(N):
@@ -96,8 +95,8 @@ def is_matrix_equals(M, N, f, g):
                 return False
     return True
 
-# Fill holes in a image
-def fill_holes(M, N, f):
+# Region Fill Algorithm
+def region_fill(M, N, f):
     i, j = find_seed(M, N, f)
     g = [[0]*(N) for i in range(M)]
     g[i][j] = 1
@@ -156,7 +155,8 @@ def get_neighbors_8(i, j):
   
   return neighbors
 
-def fill(i, j, f, f_holes_filled):
+# Flood Fill Algorithm
+def flood_fill(i, j, f, f_holes_filled):
   global object_has_holes
   tags[i][j] = 1
   for neighbor in get_neighbors_8(i, j):
@@ -166,13 +166,15 @@ def fill(i, j, f, f_holes_filled):
     same_color_as_current_pixel = f_holes_filled[i][j] == f_holes_filled[m][n]
 
     if not_visited and same_color_as_current_pixel:
-      fill(m, n, f, f_holes_filled)
+      flood_fill(m, n, f, f_holes_filled)
       if f_holes_filled[i][j] != f[i][j] and object_has_holes == False:
         object_has_holes = True
         print(" > Found a hole in this object.\n")
 
 
+# Main code
 
+# Checking arg file
 file_path_was_passed = len(sys.argv) > 1
 
 if not file_path_was_passed:
@@ -181,6 +183,8 @@ if not file_path_was_passed:
 file_path = sys.argv[1]
 
 pgm = None 
+
+# Reading PGM
 
 try:
   pgm = read_pgm(file_path)
@@ -198,8 +202,10 @@ count_objects = 0
 object_has_holes = False
 count_objects_with_holes = 0
 
-f_holes_filled = fill_holes(height, width, color)
+# Applying Region Fill
+f_holes_filled = region_fill(height, width, color)
 
+# Applying Flood Fill
 for i in range(height):
   for j in range(width):
     if tags[i][j] == NO_TAG and color[i][j] == 1:
@@ -207,10 +213,12 @@ for i in range(height):
       count_objects += 1
 
       object_has_holes = False
-      fill(i, j, color, f_holes_filled)
+      flood_fill(i, j, color, f_holes_filled)
 
       if object_has_holes:
         count_objects_with_holes += 1
+
+# Printing results
 
 print(f'\n > Found a total of {count_objects} objects.')
 print(f" > {count_objects_with_holes} have holes, while {count_objects - count_objects_with_holes} don't.")
